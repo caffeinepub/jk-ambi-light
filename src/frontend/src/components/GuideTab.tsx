@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { motion } from "motion/react";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -129,9 +130,15 @@ export default function GuideTab() {
   }, []);
 
   const handleInstall = async () => {
-    if (!installPrompt) return;
-    await installPrompt.prompt();
-    setInstallPrompt(null);
+    if (installPrompt) {
+      await installPrompt.prompt();
+      setInstallPrompt(null);
+    } else {
+      toast.info(
+        'To install: tap the Chrome menu (⋮) and choose "Add to Home Screen"',
+        { duration: 5000 },
+      );
+    }
   };
 
   return (
@@ -186,21 +193,22 @@ export default function GuideTab() {
           </div>
         </div>
 
-        {installPrompt ? (
-          <Button
-            onClick={handleInstall}
-            className="w-full sm:w-auto bg-primary hover:bg-primary/90"
-            size="lg"
-            data-ocid="guide.install.button"
-          >
-            <Download className="w-4 h-4 mr-2" />
-            Install App Now
-          </Button>
-        ) : (
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <Button
+          onClick={handleInstall}
+          className="w-full sm:w-auto bg-primary hover:bg-primary/90"
+          size="lg"
+          data-ocid="guide.install.button"
+        >
+          <Download className="w-4 h-4 mr-2" />
+          Install App Now
+        </Button>
+
+        {!installPrompt && (
+          <p className="mt-2 text-xs text-muted-foreground flex items-center gap-1">
             <span className="text-green-400">✓</span>
-            App already installed or use Chrome menu → "Add to Home Screen"
-          </div>
+            App may already be installed — button will still guide you if
+            needed.
+          </p>
         )}
       </motion.div>
 

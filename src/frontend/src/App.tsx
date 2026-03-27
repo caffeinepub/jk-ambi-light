@@ -230,7 +230,7 @@ export default function App() {
 
   return (
     <div
-      className="min-h-screen relative"
+      className="min-h-screen relative overflow-x-hidden"
       style={{
         background:
           "linear-gradient(180deg, oklch(0.055 0.012 225) 0%, oklch(0.075 0.015 225) 100%)",
@@ -260,14 +260,20 @@ export default function App() {
               </span>
             </div>
 
-            <nav className="flex items-center gap-1 flex-1">
+            <nav
+              className="flex items-center gap-1 flex-1 overflow-x-auto"
+              style={{
+                msOverflowStyle: "none",
+                scrollbarWidth: "none",
+              }}
+            >
               {NAV_TABS.map((tab) => (
                 <button
                   type="button"
                   key={tab.id}
                   data-ocid={`nav.${tab.id}.link`}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`relative px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                  className={`relative flex-shrink-0 px-4 py-2 text-sm font-medium rounded-md transition-colors whitespace-nowrap ${
                     activeTab === tab.id
                       ? "text-foreground nav-underline"
                       : "text-muted-foreground hover:text-foreground"
@@ -281,7 +287,7 @@ export default function App() {
             <button
               type="button"
               onClick={handleShare}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border border-border text-muted-foreground bg-muted/30 hover:text-foreground hover:border-primary/40 transition-colors"
+              className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border border-border text-muted-foreground bg-muted/30 hover:text-foreground hover:border-primary/40 transition-colors"
               title="Copy share link"
             >
               <Share2 className="w-3 h-3" />
@@ -290,7 +296,7 @@ export default function App() {
 
             <div
               data-ocid="usb.status.panel"
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border ${
+              className={`flex-shrink-0 flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border ${
                 isSerialConnected
                   ? "border-accent/40 text-accent bg-accent/10 glow-green"
                   : "border-border text-muted-foreground bg-muted/30"
@@ -306,7 +312,7 @@ export default function App() {
           </div>
         </header>
 
-        <main className="max-w-[1200px] mx-auto px-6 pb-16">
+        <main className="max-w-[1200px] mx-auto px-6 pb-16 overflow-y-auto overflow-x-hidden">
           <AnimatePresence mode="wait">
             {activeTab === "dashboard" && (
               <motion.div
