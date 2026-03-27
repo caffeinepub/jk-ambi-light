@@ -1,5 +1,5 @@
 import { Toaster } from "@/components/ui/sonner";
-import { Usb, Wifi, Zap } from "lucide-react";
+import { Share2, Usb, Wifi, Zap } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -17,6 +17,15 @@ import { useSettings, useUpdateSettings } from "./hooks/useQueries";
 
 type TabId = "dashboard" | "effects" | "settings" | "hardware" | "guide";
 
+type LedSides = { top: number; bottom: number; left: number; right: number };
+
+const DEFAULT_LED_SIDES: LedSides = {
+  top: 30,
+  bottom: 30,
+  left: 20,
+  right: 20,
+};
+
 const NAV_TABS: { id: TabId; label: string }[] = [
   { id: "dashboard", label: "Dashboard" },
   { id: "effects", label: "Effects" },
@@ -30,13 +39,21 @@ const DEFAULT_SETTINGS: AmbiSettings = {
   currentPowerState: false,
   autoOnTime: "08:00",
   staticColor: "#4AA3FF",
-  ledCount: BigInt(30),
+  ledCount: BigInt(100),
   scheduleDays: [true, true, true, true, true, false, false],
   autoOffTime: "23:00",
   autoPowerEnabled: false,
   selectedEffect: EffectType.rainbow,
   screenCaptureActive: false,
 };
+
+function loadLedSides(): LedSides {
+  try {
+    const stored = localStorage.getItem("j16_led_sides");
+    if (stored) return JSON.parse(stored) as LedSides;
+  } catch {}
+  return DEFAULT_LED_SIDES;
+}
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<TabId>("dashboard");
@@ -47,6 +64,7 @@ export default function App() {
   const [dominantColor, setDominantColor] = useState<
     [number, number, number] | null
   >(null);
+  const [ledSides, setLedSidesState] = useState<LedSides>(loadLedSides);
 
   const { data: backendSettings } = useSettings();
   const { mutate: updateSettings } = useUpdateSettings();
@@ -54,6 +72,37 @@ export default function App() {
   const loopRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  const setLedSides = useCallback((sides: LedSides) => {
+    setLedSidesState(sides);
+    localStorage.setItem("j16_led_sides", JSON.stringify(sides));
+  }, []);
+
+  // Keep app alive in background via AudioContext trick
+  useEffect(() => {
+    let ctx: AudioContext | null = null;
+    const handleVisibility = () => {
+      if (document.visibilityState === "hidden") {
+        try {
+          ctx = new AudioContext();
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          gain.gain.value = 0.001;
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start();
+        } catch {}
+      } else {
+        ctx?.close().catch(() => {});
+        ctx = null;
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibility);
+      ctx?.close().catch(() => {});
+    };
+  }, []);
 
   useEffect(() => {
     if (backendSettings) {
@@ -68,6 +117,16 @@ export default function App() {
     },
     [updateSettings],
   );
+
+  const handleShare = useCallback(async () => {
+    const url = window.location.href;
+    try {
+      await navigator.clipboard.writeText(url);
+      toast.success("Link copied!", { description: url });
+    } catch {
+      toast.error("Could not copy link");
+    }
+  }, []);
 
   useEffect(() => {
     if (loopRef.current) {
@@ -107,8 +166,15 @@ export default function App() {
       if (!ctx) return;
 
       ctx.drawImage(video, 0, 0, w, h);
-      const ledCount = Number(settings.ledCount);
-      const colors = sampleEdgePixels(ctx, w, h, ledCount);
+      const colors = sampleEdgePixels(
+        ctx,
+        w,
+        h,
+        ledSides.top,
+        ledSides.bottom,
+        ledSides.left,
+        ledSides.right,
+      );
 
       if (colors.length > 0) {
         const avg = colors.reduce(
@@ -151,7 +217,7 @@ export default function App() {
     settings.currentPowerState,
     settings.screenCaptureActive,
     settings.fps,
-    settings.ledCount,
+    ledSides,
     screenStream,
     isSerialConnected,
     serialPort,
@@ -212,6 +278,16 @@ export default function App() {
               ))}
             </nav>
 
+            <button
+              type="button"
+              onClick={handleShare}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border border-border text-muted-foreground bg-muted/30 hover:text-foreground hover:border-primary/40 transition-colors"
+              title="Copy share link"
+            >
+              <Share2 className="w-3 h-3" />
+              Share
+            </button>
+
             <div
               data-ocid="usb.status.panel"
               className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border ${
@@ -255,7 +331,12 @@ export default function App() {
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
                   <div className="flex flex-col gap-5">
-                    <LEDControlCard settings={settings} onSave={saveSettings} />
+                    <LEDControlCard
+                      settings={settings}
+                      onSave={saveSettings}
+                      ledSides={ledSides}
+                      setLedSides={setLedSides}
+                    />
                     <EffectsCard settings={settings} onSave={saveSettings} />
                   </div>
 
@@ -369,29 +450,31 @@ function sampleEdgePixels(
   ctx: CanvasRenderingContext2D,
   w: number,
   h: number,
-  ledCount: number,
+  top: number,
+  bottom: number,
+  left: number,
+  right: number,
 ): [number, number, number][] {
   const leds: [number, number, number][] = [];
-  const perSide = Math.ceil(ledCount / 4);
   const sample = (x: number, y: number): [number, number, number] => {
     const d = ctx.getImageData(Math.round(x), Math.round(y), 1, 1).data;
     return [d[0], d[1], d[2]];
   };
 
-  for (let i = 0; i < perSide; i++) {
-    leds.push(sample((i / perSide) * w, 1));
+  for (let i = 0; i < top; i++) {
+    leds.push(sample((i / top) * w, 1));
   }
-  for (let i = 0; i < perSide; i++) {
-    leds.push(sample(w - 2, (i / perSide) * h));
+  for (let i = 0; i < right; i++) {
+    leds.push(sample(w - 2, (i / right) * h));
   }
-  for (let i = 0; i < perSide; i++) {
-    leds.push(sample(((perSide - i) / perSide) * w, h - 2));
+  for (let i = 0; i < bottom; i++) {
+    leds.push(sample(((bottom - i) / bottom) * w, h - 2));
   }
-  for (let i = 0; i < perSide; i++) {
-    leds.push(sample(1, ((perSide - i) / perSide) * h));
+  for (let i = 0; i < left; i++) {
+    leds.push(sample(1, ((left - i) / left) * h));
   }
 
-  return leds.slice(0, ledCount);
+  return leds;
 }
 
 export { toast };

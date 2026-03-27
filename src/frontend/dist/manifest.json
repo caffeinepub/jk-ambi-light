@@ -1,0 +1,14 @@
+{
+  "name": "JK Ambi Light",
+  "short_name": "J16 Ambi",
+  "description": "Smart J16 ambient LED lighting controller",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0b0f1a",
+  "theme_color": "#4AA3FF",
+  "orientation": "landscape",
+  "icons": [
+    { "src": "/assets/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/assets/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

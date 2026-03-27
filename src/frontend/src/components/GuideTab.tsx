@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import {
   Download,
   Monitor,
@@ -8,6 +9,12 @@ import {
   Zap,
 } from "lucide-react";
 import { motion } from "motion/react";
+import { useEffect, useState } from "react";
+
+interface BeforeInstallPromptEvent extends Event {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
+}
 
 const TV_STEPS = [
   {
@@ -109,13 +116,98 @@ const FAQ = [
 export default function GuideTab() {
   const appUrl =
     typeof window !== "undefined" ? window.location.href : "this page";
+  const [installPrompt, setInstallPrompt] =
+    useState<BeforeInstallPromptEvent | null>(null);
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      e.preventDefault();
+      setInstallPrompt(e as BeforeInstallPromptEvent);
+    };
+    window.addEventListener("beforeinstallprompt", handler);
+    return () => window.removeEventListener("beforeinstallprompt", handler);
+  }, []);
+
+  const handleInstall = async () => {
+    if (!installPrompt) return;
+    await installPrompt.prompt();
+    setInstallPrompt(null);
+  };
 
   return (
     <div data-ocid="guide.panel">
+      {/* Install on TV card */}
+      <motion.div
+        initial={{ opacity: 0, y: -16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="card-glass p-5 mb-8 border border-primary/20"
+        data-ocid="guide.install.card"
+      >
+        <div className="flex items-center gap-3 mb-3">
+          <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center text-primary border border-primary/20">
+            <Download className="w-5 h-5" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold">Install App on Your TV</h2>
+            <p className="text-xs text-muted-foreground">
+              Works offline · Fullscreen · Background sync
+            </p>
+          </div>
+        </div>
+
+        <p className="text-sm text-muted-foreground mb-4">
+          Install J16 Ambi Light as a native app on your TV or device. Once
+          installed, it runs in the background and keeps your LEDs synced even
+          when you switch apps.
+        </p>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
+          <div className="card-glass p-3 text-center">
+            <div className="text-2xl mb-1">📺</div>
+            <p className="text-xs font-semibold mb-0.5">Open in Chrome</p>
+            <p className="text-xs text-muted-foreground">
+              On your TV or connected PC
+            </p>
+          </div>
+          <div className="card-glass p-3 text-center">
+            <div className="text-2xl mb-1">⬇️</div>
+            <p className="text-xs font-semibold mb-0.5">Tap Install</p>
+            <p className="text-xs text-muted-foreground">
+              Use the button below or Chrome menu → "Add to Home Screen"
+            </p>
+          </div>
+          <div className="card-glass p-3 text-center">
+            <div className="text-2xl mb-1">🚀</div>
+            <p className="text-xs font-semibold mb-0.5">Launch & Run</p>
+            <p className="text-xs text-muted-foreground">
+              Opens fullscreen and syncs LEDs in the background
+            </p>
+          </div>
+        </div>
+
+        {installPrompt ? (
+          <Button
+            onClick={handleInstall}
+            className="w-full sm:w-auto bg-primary hover:bg-primary/90"
+            size="lg"
+            data-ocid="guide.install.button"
+          >
+            <Download className="w-4 h-4 mr-2" />
+            Install App Now
+          </Button>
+        ) : (
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <span className="text-green-400">✓</span>
+            App already installed or use Chrome menu → "Add to Home Screen"
+          </div>
+        )}
+      </motion.div>
+
       <motion.div
         initial={{ opacity: 0, y: -12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
+        transition={{ duration: 0.4, delay: 0.1 }}
         className="max-w-2xl mb-10"
       >
         <div className="flex items-center gap-3 mb-2">
