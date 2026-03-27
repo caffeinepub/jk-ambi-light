@@ -323,12 +323,20 @@ export default function App() {
                 transition={{ duration: 0.25 }}
               >
                 <div className="text-center py-12 pb-8">
-                  <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-foreground mb-3">
+                  <motion.h1
+                    className="text-4xl md:text-5xl font-extrabold tracking-tight text-foreground mb-3"
+                    animate={{ x: [0, 30, 0, -30, 0] }}
+                    transition={{
+                      duration: 6,
+                      repeat: Number.POSITIVE_INFINITY,
+                      ease: "easeInOut",
+                    }}
+                  >
                     Illuminate Your World:{" "}
                     <span className="text-primary text-glow-blue">
                       Smart J16 Ambient Lighting.
                     </span>
-                  </h1>
+                  </motion.h1>
                   <p className="text-muted-foreground text-base md:text-lg max-w-xl mx-auto">
                     Control, Schedule, and Sync your LED strips seamlessly via
                     USB.
