@@ -45,7 +45,7 @@ export default function SettingsTab({
       await port.open({ baudRate: 115200 });
       setSerialPort(port);
       setIsConnected(true);
-      toast.success("Arduino reconnected!");
+      toast.success("J16 reconnected!");
     } catch {
       toast.error("Could not connect to port.");
     }
@@ -138,7 +138,7 @@ export default function SettingsTab({
                   : "bg-muted-foreground"
               }`}
             />
-            {isSerialConnected ? "Arduino Nano Connected" : "Not connected"}
+            {isSerialConnected ? "J16 Connected" : "Not connected"}
           </div>
           <Button
             data-ocid="settings.primary_button"

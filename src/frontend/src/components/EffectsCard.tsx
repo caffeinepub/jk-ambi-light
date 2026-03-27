@@ -1,8 +1,19 @@
-import { Check, Flame, Music, Palette, Waves, Wind } from "lucide-react";
+import {
+  Check,
+  Flame,
+  Monitor,
+  Music,
+  Palette,
+  Waves,
+  Wind,
+} from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
 import type { AmbiSettings } from "../backend.d";
 import { EffectType } from "../backend.d";
+
+const SCREEN_GRAB_EFFECT = "screen_grab" as const;
+type EffectTypeOrScreenGrab = EffectType | typeof SCREEN_GRAB_EFFECT;
 
 interface Props {
   settings: AmbiSettings;
@@ -11,7 +22,7 @@ interface Props {
 }
 
 const EFFECTS: {
-  id: EffectType;
+  id: EffectTypeOrScreenGrab;
   label: string;
   description: string;
   icon: React.ReactNode;
@@ -52,6 +63,13 @@ const EFFECTS: {
     icon: <Music className="w-5 h-5" />,
     previewClass: "led-rainbow",
   },
+  {
+    id: SCREEN_GRAB_EFFECT,
+    label: "Screen Grab",
+    description: "Syncs LEDs to screen colors",
+    icon: <Monitor className="w-5 h-5" />,
+    previewClass: "led-rainbow",
+  },
 ];
 
 const COLOR_PRESETS = [
@@ -67,11 +85,30 @@ const COLOR_PRESETS = [
 
 export default function EffectsCard({ settings, onSave, fullWidth }: Props) {
   const [showPicker, setShowPicker] = useState(false);
-  const selected = settings.selectedEffect;
+  const [localEffect, setLocalEffect] = useState<EffectTypeOrScreenGrab>(
+    settings.selectedEffect,
+  );
 
-  const selectEffect = (id: EffectType) => {
-    onSave({ ...settings, selectedEffect: id });
-    setShowPicker(id === EffectType.static_);
+  const selected: EffectTypeOrScreenGrab = settings.screenCaptureActive
+    ? SCREEN_GRAB_EFFECT
+    : localEffect;
+
+  const isStaticSelected = selected === EffectType.static_;
+
+  const selectEffect = (id: EffectTypeOrScreenGrab) => {
+    if (id === SCREEN_GRAB_EFFECT) {
+      setLocalEffect(SCREEN_GRAB_EFFECT);
+      onSave({ ...settings, screenCaptureActive: true });
+      setShowPicker(false);
+    } else {
+      setLocalEffect(id);
+      onSave({
+        ...settings,
+        selectedEffect: id,
+        screenCaptureActive: false,
+      });
+      setShowPicker(id === EffectType.static_);
+    }
   };
 
   return (
@@ -81,7 +118,7 @@ export default function EffectsCard({ settings, onSave, fullWidth }: Props) {
       <div
         className={`grid gap-3 ${
           fullWidth
-            ? "grid-cols-2 sm:grid-cols-3 lg:grid-cols-5"
+            ? "grid-cols-2 sm:grid-cols-3 lg:grid-cols-6"
             : "grid-cols-1"
         }`}
       >
@@ -90,7 +127,7 @@ export default function EffectsCard({ settings, onSave, fullWidth }: Props) {
           return (
             <motion.button
               type="button"
-              key={effect.id}
+              key={String(effect.id)}
               data-ocid={`effects.item.${i + 1}`}
               onClick={() => selectEffect(effect.id)}
               whileHover={{ scale: 1.02 }}
@@ -118,6 +155,7 @@ export default function EffectsCard({ settings, onSave, fullWidth }: Props) {
                 className={`flex flex-col ${fullWidth ? "items-center" : ""}`}
               >
                 <div className="flex items-center gap-1.5">
+                  {effect.icon}
                   <span
                     className={`text-sm font-semibold ${
                       isActive ? "text-primary" : "text-foreground"
@@ -143,7 +181,21 @@ export default function EffectsCard({ settings, onSave, fullWidth }: Props) {
         })}
       </div>
 
-      {(showPicker || selected === EffectType.static_) && (
+      {selected === SCREEN_GRAB_EFFECT && (
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: "auto" }}
+          className="mt-4 pt-4 border-t border-border/50"
+        >
+          <p className="text-xs text-muted-foreground flex items-center gap-2">
+            <Monitor className="w-4 h-4 text-primary flex-shrink-0" />
+            Screen Grab requires screen sharing permission. Enable it in the
+            Screen Capture card on the Dashboard.
+          </p>
+        </motion.div>
+      )}
+
+      {(showPicker || isStaticSelected) && (
         <motion.div
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: "auto" }}

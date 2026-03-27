@@ -244,7 +244,7 @@ export default function App() {
                   <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-foreground mb-3">
                     Illuminate Your World:{" "}
                     <span className="text-primary text-glow-blue">
-                      Smart Arduino Ambient Lighting.
+                      Smart J16 Ambient Lighting.
                     </span>
                   </h1>
                   <p className="text-muted-foreground text-base md:text-lg max-w-xl mx-auto">

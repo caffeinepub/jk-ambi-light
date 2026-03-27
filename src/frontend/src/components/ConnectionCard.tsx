@@ -27,7 +27,7 @@ export default function ConnectionCard({
       await port.open({ baudRate: 115200 });
       setSerialPort(port);
       setIsConnected(true);
-      toast.success("Arduino Nano connected!");
+      toast.success("J16 connected!");
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
       if (!msg.includes("cancelled") && !msg.includes("No port selected")) {
@@ -44,7 +44,7 @@ export default function ConnectionCard({
     }
     setSerialPort(null);
     setIsConnected(false);
-    toast.success("Disconnected from Arduino.");
+    toast.success("Disconnected from J16.");
   };
 
   const qrUrl = `https://chart.googleapis.com/chart?cht=qr&chs=140x140&chl=${encodeURIComponent(window.location.href)}&choe=UTF-8`;
@@ -79,7 +79,7 @@ export default function ConnectionCard({
               isConnected ? "text-accent" : "text-muted-foreground"
             }`}
           >
-            {isConnected ? "Arduino Nano Connected" : "Not Connected"}
+            {isConnected ? "J16 Connected" : "Not Connected"}
           </p>
           <p className="text-xs text-muted-foreground">
             {isConnected
@@ -110,7 +110,7 @@ export default function ConnectionCard({
           disabled={!isSerialSupported}
         >
           <Usb className="w-4 h-4 mr-2" />
-          Connect USB Arduino
+          Connect USB J16
         </Button>
       )}
 
