@@ -152,7 +152,7 @@ export default function SettingsTab({
           </Button>
           {!isSerialSupported && (
             <p className="text-xs text-muted-foreground mt-2">
-              Web Serial API requires Google Chrome or Microsoft Edge.
+              Your Smart TV needs Chrome or Edge browser for USB.
             </p>
           )}
         </div>

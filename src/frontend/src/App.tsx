@@ -323,23 +323,15 @@ export default function App() {
                 transition={{ duration: 0.25 }}
               >
                 <div className="text-center py-12 pb-8">
-                  <motion.h1
-                    className="text-4xl md:text-5xl font-extrabold tracking-tight text-foreground mb-3"
-                    animate={{ x: [0, 30, 0, -30, 0] }}
-                    transition={{
-                      duration: 6,
-                      repeat: Number.POSITIVE_INFINITY,
-                      ease: "easeInOut",
-                    }}
-                  >
+                  <motion.h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-foreground mb-3">
                     Illuminate Your World:{" "}
                     <span className="text-primary text-glow-blue">
                       Smart J16 Ambient Lighting.
                     </span>
                   </motion.h1>
                   <p className="text-muted-foreground text-base md:text-lg max-w-xl mx-auto">
-                    Control, Schedule, and Sync your LED strips seamlessly via
-                    USB.
+                    Control, Schedule, and Sync your Smart TV LED strips
+                    seamlessly via USB.
                   </p>
                 </div>
 
@@ -440,7 +432,8 @@ export default function App() {
         </main>
 
         <footer className="border-t border-border/30 py-5 text-center text-xs text-muted-foreground">
-          © {new Date().getFullYear()} JK Ambi Light. Built with ❤️ using{" "}
+          © {new Date().getFullYear()} J16 Ambi Light · Smart TV Ambient
+          Lighting · Built with ❤️ using{" "}
           <a
             href={`https://caffeine.ai?utm_source=caffeine-footer&utm_medium=referral&utm_content=${encodeURIComponent(window.location.hostname)}`}
             className="text-primary hover:underline"

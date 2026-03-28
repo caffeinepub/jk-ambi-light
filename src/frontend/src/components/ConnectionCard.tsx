@@ -85,8 +85,8 @@ export default function ConnectionCard({
             {isConnected
               ? "115200 baud · USB Serial"
               : isSerialSupported
-                ? "Click below to connect via USB"
-                : "Web Serial requires Chrome or Edge"}
+                ? "Connect J16 to your TV's USB port"
+                : "Your TV needs Chrome or Edge browser"}
           </p>
         </div>
       </div>

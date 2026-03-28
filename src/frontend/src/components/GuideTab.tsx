@@ -19,9 +19,9 @@ interface BeforeInstallPromptEvent extends Event {
 
 const TV_STEPS = [
   {
-    title: "Open Chrome or Edge on your TV",
+    title: "Open Chrome or Edge on your Smart TV",
     description:
-      "Android TVs can install Chrome from the Play Store. Alternatively, connect a PC or laptop to the TV via HDMI — the browser then runs on the PC while the image shows on the TV.",
+      "Android TVs and Smart TVs with Chrome or Edge browser are supported. Install Chrome from the Play Store if needed.",
   },
   {
     title: "Navigate to this app",
@@ -29,8 +29,7 @@ const TV_STEPS = [
   },
   {
     title: "Plug in the J16 device",
-    description:
-      "Insert the J16 USB cable into a USB port on the same device that is running the browser (PC, laptop, or the TV itself).",
+    description: "Insert the J16 USB cable into a USB port on your Smart TV.",
   },
   {
     title: "Click \u201cConnect USB\u201d in the Dashboard tab",
@@ -43,16 +42,16 @@ const TV_STEPS = [
       "In the Screen Capture card, toggle 'Ambilight Sync' on and choose which display to capture.",
   },
   {
-    title: "Done! LEDs sync with the screen",
+    title: "Done! LEDs sync with your TV screen",
     description:
-      "The LED strip will now mirror the border colours of whatever is on your screen in real time.",
+      "The LED strip will now mirror the border colours of whatever is on your TV in real time.",
   },
 ];
 
 const TV_TIPS = [
-  "Use HDMI to connect a laptop or PC to your TV for the best experience.",
-  "Android TV with Chrome can also work — install Chrome from the Play Store.",
-  "The J16 USB cable should go into the same device running the browser.",
+  "Android TV and Smart TVs with Chrome or Edge work great.",
+  "Install Chrome from the Google Play Store if your TV doesn't have it.",
+  "The J16 USB cable should go into a USB port on your TV.",
   "Web Serial (USB) only works in Chrome and Edge — not Firefox or Safari.",
 ];
 
@@ -61,7 +60,7 @@ const STEPS = [
     icon: <Download className="w-5 h-5" />,
     title: "1. Get the Hardware",
     description:
-      "Purchase a J16 controller and a WS2812B LED strip. You'll need at least 30\u201360 LEDs for a good ambient effect around your screen.",
+      "Purchase a J16 controller and a WS2812B LED strip. You'll need at least 30\u201360 LEDs for a good ambient effect around your TV.",
   },
   {
     icon: <Zap className="w-5 h-5" />,
@@ -73,13 +72,13 @@ const STEPS = [
     icon: <Usb className="w-5 h-5" />,
     title: "3. Connect via USB",
     description:
-      "Plug the J16 into your PC or TV via USB. Open J16 Ambi Light in Chrome or Edge, go to Dashboard, and click 'Connect USB'.",
+      "Plug the J16 into your Smart TV via USB. Open J16 Ambi Light in Chrome or Edge, go to Dashboard, and click 'Connect USB'.",
   },
   {
     icon: <Monitor className="w-5 h-5" />,
     title: "4. Enable Screen Sync",
     description:
-      "Toggle 'Ambilight Sync' in the Screen Capture card. Select which display to capture. The app will sample edge pixels and send colours to your LEDs at the configured FPS.",
+      "Toggle 'Ambilight Sync' in the Screen Capture card. Select the display to capture. The app samples edge pixels and sends colours to your LEDs at the configured FPS.",
   },
   {
     icon: <Settings className="w-5 h-5" />,
@@ -91,26 +90,26 @@ const STEPS = [
     icon: <Share2 className="w-5 h-5" />,
     title: "6. Share the App",
     description:
-      "The app is free to share! Scan the QR code in the Connection card to send the link to friends and family. Works on PC and TV.",
+      "The app is free to share! Scan the QR code in the Connection card to send the link to friends and family. Works on any Smart TV.",
   },
 ];
 
 const FAQ = [
   {
     q: "Why doesn't USB connect work?",
-    a: "Web Serial API only works in Chrome and Edge browsers. Firefox is not supported.",
+    a: "Web Serial API only works in Chrome and Edge browsers. Make sure your Smart TV has Chrome or Edge installed.",
   },
   {
     q: "Can I use more than 300 LEDs?",
     a: "The app supports up to 500 LEDs. For more, you may need to reduce FPS to avoid serial bottlenecks.",
   },
   {
-    q: "Does it work on TV?",
-    a: "Yes! Connect your PC or laptop to the TV via HDMI, open this app in Chrome, plug J16 into USB, and you're set. Android TVs with Chrome installed also work.",
+    q: "Does it work on Smart TV?",
+    a: "Yes! Install Chrome or Edge on your Smart TV, open this app, plug J16 into your TV's USB port, and you're set.",
   },
   {
     q: "What LED strip should I buy?",
-    a: "WS2812B (NeoPixel) strips are recommended — they're affordable and widely available. 60 LEDs/meter density works well for most screens.",
+    a: "WS2812B (NeoPixel) strips are recommended — they're affordable and widely available. 60 LEDs/meter density works well for most TVs.",
   },
 ];
 
@@ -135,7 +134,7 @@ export default function GuideTab() {
       setInstallPrompt(null);
     } else {
       toast.info(
-        'To install: tap the Chrome menu (⋮) and choose "Add to Home Screen"',
+        'To install: tap the Chrome menu (\u22ee) and choose "Add to Home Screen"',
         { duration: 5000 },
       );
     }
@@ -173,9 +172,7 @@ export default function GuideTab() {
           <div className="card-glass p-3 text-center">
             <div className="text-2xl mb-1">📺</div>
             <p className="text-xs font-semibold mb-0.5">Open in Chrome</p>
-            <p className="text-xs text-muted-foreground">
-              On your TV or connected PC
-            </p>
+            <p className="text-xs text-muted-foreground">On your Smart TV</p>
           </div>
           <div className="card-glass p-3 text-center">
             <div className="text-2xl mb-1">⬇️</div>
